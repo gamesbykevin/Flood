@@ -50,7 +50,10 @@ public class MainActivity extends Activity
         super.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         //set the screen to full screen
-        super.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        super.getWindow().setFlags(
+        	WindowManager.LayoutParams.FLAG_FULLSCREEN, 
+        	WindowManager.LayoutParams.FLAG_FULLSCREEN
+        );
         
         //call parent create
         super.onCreate(savedInstanceState);

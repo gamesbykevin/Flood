@@ -64,7 +64,7 @@ public final class ScreenManager implements Screen, Disposable
     /**
      * The y-coordinate where we want to start putting the buttons
      */
-    public static final int BUTTON_Y = 120;
+    public static final int BUTTON_Y = 135;
     
     /**
      * The y-coordinate spacing between each button
@@ -260,14 +260,15 @@ public final class ScreenManager implements Screen, Disposable
             
             //draw the background
             background.render(canvas);
-
-            //render game screen
+            
+            //render the game
             getScreenGame().render(canvas);
             
             //render the appropriate screen
             switch (getState())
             {
                 case Ready:
+                	
                 	//darken background
                     darkenBackground(canvas);
                     
@@ -277,10 +278,11 @@ public final class ScreenManager implements Screen, Disposable
                     break;
 
                 case Running:
-                    //we already rendered the game
+                	//game is already rendered, don't need to do anything here
                     break;
 
                 case Paused:
+                	
                     //if the previous state is not running, render it
                     if (getScreenPaused().getStatePrevious() != State.Running)
                         getScreen(getScreenPaused().getStatePrevious()).render(canvas);
@@ -293,6 +295,8 @@ public final class ScreenManager implements Screen, Disposable
                     break;
 
                 case Options:
+                	
+                	//darken background
                     darkenBackground(canvas);
                     
                     if (getScreen(getState()) != null)
@@ -308,6 +312,7 @@ public final class ScreenManager implements Screen, Disposable
                     break;
                     
                 case GameOver:
+                	
                     //render game over info
                     getScreen(getState()).render(canvas);
                     break;

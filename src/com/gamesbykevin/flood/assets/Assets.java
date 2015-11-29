@@ -91,6 +91,7 @@ public class Assets
     	AudioOff,
     	AudioOn,
     	Background,
+    	Colors,
     	Exit,
     	Pause
     }

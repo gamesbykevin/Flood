@@ -25,6 +25,7 @@ public class OptionsScreen implements Screen, Disposable
     //our logo reference
     private final Bitmap logo;
     
+    //list of buttons
     private SparseArray<Button> buttons;
     
     //our main screen reference

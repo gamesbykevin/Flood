@@ -9,7 +9,6 @@ import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.flood.assets.Assets;
 import com.gamesbykevin.flood.game.Game;
-import com.gamesbykevin.flood.panel.GamePanel;
 import com.gamesbykevin.flood.screen.OptionsScreen;
 import com.gamesbykevin.flood.screen.ScreenManager;
 
@@ -37,7 +36,7 @@ public class Controller implements IController
 
     //location of exit button
     private final static int EXIT_X = (int)(BUTTON_DIMENSION * .25);
-    private final static int EXIT_Y = (BUTTON_DIMENSION / 4);
+    private final static int EXIT_Y = (int)(BUTTON_DIMENSION * .25);//GamePanel.HEIGHT - (int)(BUTTON_DIMENSION * 1.25);
     
     //location of sound button
     private final static int SOUND_X = EXIT_X + (int)(BUTTON_DIMENSION * 1.5);
@@ -45,7 +44,7 @@ public class Controller implements IController
     
     //location of pause button
     private final static int PAUSE_X = SOUND_X + (int)(BUTTON_DIMENSION * 1.5);
-    private final static int PAUSE_Y = SOUND_Y;
+    private final static int PAUSE_Y = EXIT_Y;
     
     /**
      * Default Constructor

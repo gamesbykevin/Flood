@@ -5,8 +5,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.MotionEvent;
 
+import com.gamesbykevin.flood.board.Board;
 import com.gamesbykevin.flood.game.controller.Controller;
 import com.gamesbykevin.flood.screen.ScreenManager;
+import com.gamesbykevin.flood.screen.ScreenManager.State;
 
 /**
  * The main game logic will happen here
@@ -22,6 +24,9 @@ public final class Game implements IGame
     
     //our controller object
     private Controller controller;
+    
+    //the board of play
+    private Board board;
     
     //is the game being reset
     private boolean reset = false;
@@ -44,6 +49,9 @@ public final class Game implements IGame
         
         //create new controller
         this.controller = new Controller(this);
+        
+        //create a new board
+        this.board = new Board();
     }
     
     /**
@@ -53,6 +61,15 @@ public final class Game implements IGame
     public ScreenManager getScreen()
     {
         return this.screen;
+    }
+    
+    /**
+     * Get the board
+     * @return The board reference object
+     */
+    public Board getBoard()
+    {
+    	return this.board;
     }
     
     /**
@@ -111,9 +128,11 @@ public final class Game implements IGame
     	if (hasReset())
     		return;
     	
-        //only update controller if exists
+        //update the following
         if (getController() != null)
         	getController().update(event, x, y);
+        if (getBoard() != null)
+        	getBoard().update(event, x, y);
     }
     
     /**
@@ -128,12 +147,30 @@ public final class Game implements IGame
         	//flag reset false
         	setReset(false);
         	
+        	//reset controller
         	if (getController() != null)
         		getController().reset();
+        	
+        	//reset board
+        	if (getBoard() != null)
+        		getBoard().reset(10, 3);
         }
         else
         {
-        	//update the game elements
+        	//don't update if we don't have the win
+        	if (!getBoard().hasWin())
+        	{
+	        	//update the game elements
+	        	if (getController() != null)
+	        		getController().update();
+	        	if (getBoard() != null)
+	        		getBoard().update();
+        	}
+        	else
+        	{
+        		//go to game over state
+        		getScreen().setState(State.GameOver);
+        	}
         }
     }
     
@@ -145,6 +182,11 @@ public final class Game implements IGame
     @Override
     public void render(final Canvas canvas) throws Exception
     {
+    	//darken background
+    	ScreenManager.darkenBackground(canvas);
+    	
+    	if (getBoard() != null)
+    		getBoard().render(canvas);
     	if (getController() != null)
     		getController().render(canvas);
     }
