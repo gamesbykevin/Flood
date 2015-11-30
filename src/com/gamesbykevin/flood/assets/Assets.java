@@ -92,7 +92,12 @@ public class Assets
     	AudioOn,
     	Background,
     	Colors,
+    	ColorsFlooded,
     	Exit,
+    	LevelComplete,
+    	LevelOpen,
+    	PageNext,
+    	PagePrevious,
     	Pause
     }
     
@@ -120,7 +125,7 @@ public class Assets
      */
     public enum AudioGameKey
     {
-    	//Congratulations,
+    	Lose, Switch1, Switch2, Switch3, Switch4, Switch5, Switch6, Win
     }
     
     /**

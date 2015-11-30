@@ -1,5 +1,7 @@
 package com.gamesbykevin.flood.board;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import com.gamesbykevin.flood.board.Board.Colors;
@@ -65,7 +67,7 @@ public final class BoardHelper
 	
 	/**
 	 * Floor the neighbor.<br>
-	 * The neighbor will be flooded if it has not been previously
+	 * The neighbor will be flooded if it has not been previously and the colors match
 	 * @param squares The array for all the squares
 	 * @param current The current square
 	 * @param col The desired neighbor location (column)
@@ -124,7 +126,7 @@ public final class BoardHelper
 	/**
 	 * Group the matching color squares.<br>
 	 * Here we will check each square and every neighbor (N, S, E, W) with a matching color will be assigned the same id
-	 * This will help when flooding similar colors that are grouped together
+	 * This will help when flooding similar colors as they will be grouped together
 	 * @param squares The desired array of squares to check
 	 */
 	protected static void groupSquares(final Square[][] squares)
@@ -160,7 +162,8 @@ public final class BoardHelper
 	}
 	
 	/**
-	 * Join the square with the specified neighbor
+	 * Join the square with the specified neighbor.<br>
+	 * Here we will make the color matching neighbor have the same id
 	 * @param squares The array of all squares
 	 * @param square The square we want to join
 	 * @param col Column of the neighboring square we want to join
@@ -208,7 +211,8 @@ public final class BoardHelper
 	}
 	
 	/**
-	 * Get the count.
+	 * Get the count.<br>
+	 * We will count the number of squares that have a matching id.
 	 * @param squares Array of squares to check
 	 * @param square The square containing the id we want to count
 	 * @return The total number of squares with the same id
@@ -231,5 +235,53 @@ public final class BoardHelper
 		
 		//return our result
 		return count;
+	}
+	
+	/**
+	 * Count the number of unique colors.
+	 * @param squares Array of squares to check
+	 * @return The total number of different colors found
+	 */
+	protected static int getUniqueColorCount(final Square[][] squares)
+	{
+		//list of colors we found
+		List<Colors> colors = new ArrayList<Colors>();
+		
+		for (int row = 0; row < squares.length; row++)
+		{
+			for (int col = 0; col < squares[0].length; col++)
+			{
+				Square square = squares[row][col];
+				
+				if (colors.isEmpty())
+				{
+					colors.add(square.getColor());
+				}
+				else
+				{
+					//does the color already exist in our list
+					boolean match = false;
+					
+					for (int index = 0; index < colors.size(); index++)
+					{
+						if (colors.get(index) == square.getColor())
+						{
+							//flag exists
+							match = true;
+							
+							//exit loop
+							break;
+						}
+					}
+					
+					//if no match add it to the list
+					if (!match)
+						colors.add(square.getColor());
+				}
+			}
+		}
+		
+		//return the number of colors we found
+		return colors.size();
 	}
 }

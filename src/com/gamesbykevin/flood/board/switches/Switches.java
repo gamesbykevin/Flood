@@ -1,5 +1,6 @@
 package com.gamesbykevin.flood.board.switches;
 
+import com.gamesbykevin.androidframework.resources.Audio;
 import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.flood.assets.Assets;
@@ -25,9 +26,30 @@ public class Switches implements Disposable
 	 */
 	private static final int SWITCH_PADDING = 15;
 	
+	//the number of attempts
+	private int attempts = 0;
+	
 	public Switches()
 	{
 		//default constructor
+	}
+	
+	/**
+	 * Get the attempts
+	 * @return The number of attempts used to solve the game
+	 */
+	public int getAttempts()
+	{
+		return this.attempts;
+	}
+	
+	/**
+	 * Set the attempts
+	 * @param attempts The number of attempts used to solve the game
+	 */
+	public void setAttempts(final int attempts)
+	{
+		this.attempts = attempts;
 	}
 	
 	@Override
@@ -48,6 +70,11 @@ public class Switches implements Disposable
 		}
 	}
 
+	/**
+	 * Check if any switches can be clicked with the specified coordinates
+	 * @param x x-coordinate
+	 * @param y y-coordinate
+	 */
 	public void update(final float x, final float y) 
 	{
 		//make sure we don't press multiple buttons
@@ -73,6 +100,10 @@ public class Switches implements Disposable
 		}
 	}
 
+	/**
+	 * Check if any switches have been clicked and if so update the board
+	 * @param board The board in play
+	 */
 	public void update(final Board board) 
 	{
 		//did we click anything
@@ -84,6 +115,38 @@ public class Switches implements Disposable
 			//if we clicked this switch
 			if (tmp.isClicked())
 			{
+				//play sound effect
+				switch (tmp.getColor())
+				{
+					case Orange:
+						Audio.play(Assets.AudioGameKey.Switch1);
+						break;
+						
+					case Red:
+						Audio.play(Assets.AudioGameKey.Switch2);
+						break;
+						
+					case Yellow:
+						Audio.play(Assets.AudioGameKey.Switch3);
+						break;
+						
+					case Blue:
+						Audio.play(Assets.AudioGameKey.Switch4);
+						break;
+						
+					case Purple:
+						Audio.play(Assets.AudioGameKey.Switch5);
+						break;
+						
+					case Green:
+					default:
+						Audio.play(Assets.AudioGameKey.Switch6);
+						break;
+				}
+				
+				//increase our attempt count
+				setAttempts(getAttempts() + 1);
+				
 				//flood the squares on the board
 				BoardHelper.floodSquares(board.getKey(), tmp.getColor());
 				
@@ -117,17 +180,26 @@ public class Switches implements Disposable
 		}
 	}
 
-	public void reset(final int size, final int colors, final int dimension, final Colors current) 
+	/**
+	 * Reset the switches with the specified parameters
+	 * @param total The total number of colors
+	 * @param dimension The default dimension size of a square on the board
+	 * @param current The current color for the flood
+	 */
+	public void reset(final int total, final int dimension, final Colors current) 
 	{
-		//create new array for the board switches
-		this.switches = new Switch[size];
+		//reset attempts
+		setAttempts(0);
+		
+		//create new array for the button switches
+		this.switches = new Switch[total];
 		
 		//calculate the start coordinates
-		int x = (GamePanel.WIDTH / 2) - (((size * SWITCH_DIMENSION) + ((size - 1) * SWITCH_PADDING)) / 2);
+		int x = (GamePanel.WIDTH / 2) - (((total * SWITCH_DIMENSION) + ((total - 1) * SWITCH_PADDING)) / 2);
 		final int y = Board.BOUNDS.bottom + (int)(dimension * 1.25);
 
 		//render the buttons
-		for (int index = 0; index < colors; index++)
+		for (int index = 0; index < total; index++)
 		{
 			//create a new switch of the specified color
 			this.switches[index] = new Switch(

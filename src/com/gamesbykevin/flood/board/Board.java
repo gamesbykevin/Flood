@@ -1,6 +1,8 @@
 package com.gamesbykevin.flood.board;
 
 import com.gamesbykevin.androidframework.base.Entity;
+import com.gamesbykevin.androidframework.resources.Images;
+import com.gamesbykevin.flood.assets.Assets;
 import com.gamesbykevin.flood.board.switches.Switch;
 import com.gamesbykevin.flood.board.switches.Switches;
 import com.gamesbykevin.flood.panel.GamePanel;
@@ -35,8 +37,9 @@ public class Board extends Entity implements IBoard
 	public enum Colors
 	{
 		Orange, Red, Blue,
-		Green, Purple, Yellow
-		//White, Pink, Black 
+		Green, Purple, Yellow,
+		OrangeFlooded, RedFlooded, BlueFlooded,
+		GreenFlooded, PurpleFlooded, YellowFlooded,
 	}
 	
 	//the board containing our colors
@@ -53,6 +56,12 @@ public class Board extends Entity implements IBoard
 	
 	//the button switches we can click
 	private Switches switches;
+	
+	//the maximum number of allowed attempts to resolve
+	private int max = 1;
+	
+	//has the board been generated
+	private boolean generated = false;
 	
 	/**
 	 * Create a new board
@@ -156,12 +165,15 @@ public class Board extends Entity implements IBoard
 	@Override
 	public void reset(final int size, int total)
 	{
+		//flag generated false
+		setGenerated(false);
+		
 		//flag win false
 		setWin(false);
 		
 		//make sure we don't exceed the number of colors available
-		if (total > Colors.values().length)
-			total = Colors.values().length;
+		if (total > (Colors.values().length / 2))
+			total = (Colors.values().length / 2);
 		
 		//store the total number of colors
 		this.total = total;
@@ -176,18 +188,29 @@ public class Board extends Entity implements IBoard
 		//create new key first
 		this.key = new Square[size][size];
 		
-		//pick random color
-		for (int row = 0; row < key.length; row++)
+		//make sure we have a board that contains each of the available colors
+		while (true)
 		{
-			for (int col = 0; col < key[0].length; col++)
+			//pick random color
+			for (int row = 0; row < key.length; row++)
 			{
-				//pick random color
-				final Colors color = Colors.values()[GamePanel.RANDOM.nextInt(getTotal())];
-				
-				//create a new square with the color
-				getKey()[row][col] = new Square(color);
+				for (int col = 0; col < key[0].length; col++)
+				{
+					//pick random color
+					final Colors color = Colors.values()[GamePanel.RANDOM.nextInt(getTotal())];
+					
+					//create a new square with the color
+					getKey()[row][col] = new Square(color);
+				}
 			}
+			
+			//if the board has each of the unique colors for this game, we can exit loop
+			if (BoardHelper.getUniqueColorCount(getKey()) >= getTotal())
+				break;
 		}
+		
+		//assign the max number of allowed attempts depending on the size and # of different colors
+		setMax((int)Math.ceil(25 * ((size + size) * getTotal()) / 168) + 2);
 		
 		//assign the current color as the start location
 		setCurrent(getKey()[0][0].getColor());
@@ -202,7 +225,37 @@ public class Board extends Entity implements IBoard
 		BoardHelper.floodSquares(getKey(), getCurrent());
 		
 		//reset the switches
-		getSwitches().reset(size, getTotal(), getDimension(), getCurrent());
+		getSwitches().reset(getTotal(), getDimension(), getCurrent());
+		
+		//flag generated true
+		setGenerated(true);
+	}
+	
+	/**
+	 * Set the maximum amount of moves to solve the puzzle
+	 * @param max The number of allowed attempts to solve
+	 */
+	protected void setMax(final int max)
+	{
+		this.max = max;
+	}
+	
+	/**
+	 * Get the max.
+	 * @return The maximum amount of attempts to solve the puzzle
+	 */
+	public int getMax()
+	{
+		return this.max;
+	}
+	
+	/**
+	 * Get the number of attempts
+	 * @return The current number of attempts to solve the game
+	 */
+	public int getAttempts()
+	{
+		return getSwitches().getAttempts();
 	}
 	
 	/**
@@ -242,6 +295,15 @@ public class Board extends Entity implements IBoard
 	}
 	
 	/**
+	 * Flag the board s generated
+	 * @param generated true if the board has been generated, false otherwise
+	 */
+	public void setGenerated(final boolean generated)
+	{
+		this.generated = generated;
+	}
+	
+	/**
 	 * Render the board
 	 * @param canvas
 	 * @throws Exception
@@ -249,28 +311,67 @@ public class Board extends Entity implements IBoard
 	@Override
 	public void render(final Canvas canvas) throws Exception
 	{
-		//don't continue if the board does not exist
-		if (getKey() == null)
-			return;
-		
-		//check every square
-		for (int row = 0; row < getKey().length; row++)
+		//if the game has not been generated render loading screen
+		if (!generated)
 		{
-			for (int col = 0; col < getKey()[0].length; col++)
-			{
-				//assign coordinates
-				setX(BOUNDS.left + (col * getDimension()));
-				setY(BOUNDS.top + (row * getDimension()));
-				
-				//assign animation
-				getSpritesheet().setKey(getKey()[row][col].getColor());
-				
-				//render the current animation
-				render(canvas);
-			}
+			//render loading screen
+			canvas.drawBitmap(Images.getImage(Assets.ImageMenuKey.Splash), 0, 0, null);
 		}
-		
-		//render the switches
-		getSwitches().render(canvas);
+		else
+		{
+			//check every square
+			for (int row = 0; row < getKey().length; row++)
+			{
+				for (int col = 0; col < getKey()[0].length; col++)
+				{
+					//assign coordinates
+					setX(BOUNDS.left + (col * getDimension()));
+					setY(BOUNDS.top + (row * getDimension()));
+					
+					//assign animation
+					getSpritesheet().setKey(getKey()[row][col].getColor());
+					
+					//if the square is flooded we will render a different animation
+					if (getKey()[row][col].isFlooded())
+					{
+						switch (getKey()[row][col].getColor())
+						{
+							case Orange:
+								getSpritesheet().setKey(Colors.OrangeFlooded);
+								break;
+								
+							case Red:
+								getSpritesheet().setKey(Colors.RedFlooded);
+								break;
+								
+							case Blue:
+								getSpritesheet().setKey(Colors.BlueFlooded);
+								break;
+								
+							case Green:
+								getSpritesheet().setKey(Colors.GreenFlooded);
+								break;
+								
+							case Purple:
+								getSpritesheet().setKey(Colors.PurpleFlooded);
+								break;
+								
+							case Yellow:
+								getSpritesheet().setKey(Colors.YellowFlooded);
+								break;
+								
+							default:
+								throw new Exception("Color not setup here: " + getKey()[row][col].getColor());
+						}
+					}
+					
+					//render the current animation
+					super.render(canvas);
+				}
+			}
+			
+			//render the switches
+			getSwitches().render(canvas);
+		}
 	}
 }

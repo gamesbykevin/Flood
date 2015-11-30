@@ -40,9 +40,10 @@ public class OptionsScreen implements Screen, Disposable
     //buttons to access each button list
     public static final int INDEX_BUTTON_BACK = 0;
     public static final int INDEX_BUTTON_SOUND = 1;
-    public static final int INDEX_BUTTON_INSTRUCTIONS = 2;
-    public static final int INDEX_BUTTON_FACEBOOK = 3;
-    public static final int INDEX_BUTTON_TWITTER = 4;
+    public static final int INDEX_BUTTON_COLORS = 2;
+    public static final int INDEX_BUTTON_INSTRUCTIONS = 3;
+    public static final int INDEX_BUTTON_FACEBOOK = 4;
+    public static final int INDEX_BUTTON_TWITTER = 5;
     
     public OptionsScreen(final ScreenManager screen)
     {
@@ -68,6 +69,11 @@ public class OptionsScreen implements Screen, Disposable
         //add sound option
         addButtonSound(x, y);
         
+        //add colors option
+        y += ScreenManager.BUTTON_Y_INCREMENT;
+        addButtonColors(x, y);
+        
+        //the back button
         y += ScreenManager.BUTTON_Y_INCREMENT;
         addButtonBack(x, y);
         
@@ -127,9 +133,20 @@ public class OptionsScreen implements Screen, Disposable
         this.buttons.put(INDEX_BUTTON_TWITTER, tmp);
     }
     
-    private void addButtonBack(int x, int y)
+    private void addButtonColors(final int x, final int y)
     {
-        //the back button
+        Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.addDescription("Colors: 3");
+        button.addDescription("Colors: 4");
+        button.addDescription("Colors: 5");
+        button.addDescription("Colors: 6");
+        button.setX(x);
+        button.setY(y);
+        this.buttons.put(INDEX_BUTTON_COLORS, button);
+    }
+    
+    private void addButtonBack(final int x, final int y)
+    {
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.addDescription("Go  Back");
         button.setX(x);
@@ -137,7 +154,7 @@ public class OptionsScreen implements Screen, Disposable
         this.buttons.put(INDEX_BUTTON_BACK, button);
     }
     
-    private void addButtonSound(int x, int y)
+    private void addButtonSound(final int x, final int y)
     {
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
         button.addDescription("Sound: Enabled");
@@ -186,6 +203,7 @@ public class OptionsScreen implements Screen, Disposable
 	        		{
 						case INDEX_BUTTON_BACK:
 						case INDEX_BUTTON_SOUND:
+						case INDEX_BUTTON_COLORS:
 							button.positionText(paint);
 							break;
 							
@@ -274,16 +292,17 @@ public class OptionsScreen implements Screen, Disposable
                         //exit loop
                         return false;
                         
-                    /*
-    				case INDEX_BUTTON_SIZE:
-    				case INDEX_BUTTON_MODE:
-                    	
+    				case INDEX_BUTTON_COLORS:
+    					
+    					//change index
+    					button.setIndex(button.getIndex() + 1);
+    					
+    					//position the text
+    			        button.positionText(paint);
+    					
                         //play sound effect
                         Audio.play(Assets.AudioMenuKey.Selection);
-                        
-                        //exit loop
-                        return false;
-                    */
+    					return false;
                         
     				case INDEX_BUTTON_INSTRUCTIONS:
     					
@@ -351,6 +370,7 @@ public class OptionsScreen implements Screen, Disposable
     			{
 	    			case INDEX_BUTTON_BACK:
 	    			case INDEX_BUTTON_SOUND:
+	    			case INDEX_BUTTON_COLORS:
 	    				buttons.get(index).render(canvas, paint);
 	    				break;
 	    				

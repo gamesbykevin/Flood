@@ -245,6 +245,9 @@ public class MenuScreen implements Screen, Disposable
 		                    //flag notify false
 		                    notify = false;
 		                    
+		                    //play sound effect
+		                    Audio.play(Assets.AudioMenuKey.Selection);
+		                    
 		                    //we do not request any additional events
 		                    return false;
 		                    
@@ -313,9 +316,6 @@ public class MenuScreen implements Screen, Disposable
 
             //set running state
             screen.setState(ScreenManager.State.Running);
-
-            //play sound effect
-            Audio.play(Assets.AudioMenuKey.Selection);
             
             //we are done resetting
             reset = false;

@@ -72,23 +72,42 @@ public final class Switch extends Button
 	 */
 	public static void setupAnimation(final Entity entity, final Colors color)
 	{
+		final int rows = 2;
+		final int cols = 3;
+		
 		int index = 0;
 		
 		//setup animation
-		for (int row = 0; row < 3; row++)
+		for (int row = 0; row < rows; row++)
 		{
-			for (int col = 0; col < 3; col++)
+			for (int col = 0; col < cols; col++)
 			{
-				//we don't want to continue if we exceeded the length of our array
-				if (index >= Colors.values().length)
-					break;
-				
 				int x = col * ANIMATION_DIMENSION;
 				int y = row * ANIMATION_DIMENSION;
 				int d = ANIMATION_DIMENSION;
 				
 				//create new animation
 				Animation animation = new Animation(Images.getImage(Assets.ImageGameKey.Colors), x, y, d, d);
+				
+				//add to sprite sheet
+				entity.getSpritesheet().add(Colors.values()[index], animation);
+				
+				//increase the index
+				index++;
+			}
+		}
+		
+		//setup animations for the flooded
+		for (int row = 0; row < rows; row++)
+		{
+			for (int col = 0; col < cols; col++)
+			{
+				int x = col * ANIMATION_DIMENSION;
+				int y = row * ANIMATION_DIMENSION;
+				int d = ANIMATION_DIMENSION;
+				
+				//create new animation
+				Animation animation = new Animation(Images.getImage(Assets.ImageGameKey.ColorsFlooded), x, y, d, d);
 				
 				//add to sprite sheet
 				entity.getSpritesheet().add(Colors.values()[index], animation);

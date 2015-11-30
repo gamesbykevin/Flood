@@ -26,8 +26,8 @@ public class GameoverScreen implements Screen, Disposable
     //our main screen reference
     private final ScreenManager screen;
     
-    //object to paint background
-    private Paint paintMessage;
+    //object to paint message
+    private Paint paint;
     
     //the message to display
     private String message = "";
@@ -150,21 +150,21 @@ public class GameoverScreen implements Screen, Disposable
         Rect tmp = new Rect();
         
         //create paint text object for the message
-        if (paintMessage == null)
+        if (paint == null)
         {
 	        //assign metrics
-            paintMessage = new Paint();
-	        paintMessage.setColor(Color.WHITE);
-	        paintMessage.setTextSize(48f);
-	        paintMessage.setTypeface(Font.getFont(Assets.FontGameKey.Default));
+        	paint = new Paint();
+        	paint.setColor(Color.WHITE);
+        	paint.setTextSize(64f);
+	        paint.setTypeface(Font.getFont(Assets.FontGameKey.Default));
         }
         
         //get the rectangle around the message
-        paintMessage.getTextBounds(message, 0, message.length(), tmp);
+        paint.getTextBounds(message, 0, message.length(), tmp);
         
         //calculate the position of the message
         messageX = (GamePanel.WIDTH / 2) - (tmp.width() / 2);
-        messageY = (int)(GamePanel.HEIGHT * .25);
+        messageY = (int)(GamePanel.HEIGHT * .12);
     }
     
     /**
@@ -203,13 +203,18 @@ public class GameoverScreen implements Screen, Disposable
         		if (!button.contains(x, y))
         			continue;
         		
+                //remove message
+                setMessage("");
+                
         		//handle each button different
         		switch (index)
         		{
 	        		case INDEX_BUTTON_NEW:
-	                    //remove message
-	                    setMessage("");
 	                    
+	                    //move to the next level
+	                    screen.getScreenGame().getGame().getLevelSelect().setLevelIndex(screen.getScreenGame().getGame().getLevelSelect().getLevelIndex() + 1);
+	                    
+	                    //reset with the same settings
 	                    screen.getScreenGame().getGame().reset();
 	                    
 	                    //move back to the game
@@ -222,8 +227,9 @@ public class GameoverScreen implements Screen, Disposable
 	                    return false;
 
 	        		case INDEX_BUTTON_REPLAY:
-	                    //remove message
-	                    setMessage("");
+	                    
+	                    //reset with the same settings
+	                    screen.getScreenGame().getGame().reset();
 	                    
 	                    //move back to the game
 	                    screen.setState(ScreenManager.State.Running);
@@ -235,8 +241,6 @@ public class GameoverScreen implements Screen, Disposable
 	                    return false;
 	        			
 	        		case INDEX_BUTTON_MENU:
-	                    //remove message
-	                    setMessage("");
 	                    
 	                    //move to the main menu
 	                    screen.setState(ScreenManager.State.Ready);
@@ -248,8 +252,6 @@ public class GameoverScreen implements Screen, Disposable
 	                    return false;
 	        			
 	        		case INDEX_BUTTON_RATE:
-	                    //remove message
-	                    setMessage("");
 	                    
 	                    //play sound effect
 	                    Audio.play(Assets.AudioMenuKey.Selection);
@@ -296,8 +298,8 @@ public class GameoverScreen implements Screen, Disposable
             ScreenManager.darkenBackground(canvas);
             
             //if message exists, draw the text
-            if (paintMessage != null)
-                canvas.drawText(this.message, messageX, messageY, paintMessage);
+            if (paint != null)
+                canvas.drawText(this.message, messageX, messageY, paint);
         
             //render the buttons
             for (int index = 0; index < buttons.size(); index++)
@@ -310,8 +312,8 @@ public class GameoverScreen implements Screen, Disposable
     @Override
     public void dispose()
     {
-        if (paintMessage != null)
-            paintMessage = null;
+        if (paint != null)
+        	paint = null;
         
         if (buttons != null)
         {
