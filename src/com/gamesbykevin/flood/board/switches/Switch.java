@@ -97,26 +97,6 @@ public final class Switch extends Button
 			}
 		}
 		
-		//setup animations for the flooded
-		for (int row = 0; row < rows; row++)
-		{
-			for (int col = 0; col < cols; col++)
-			{
-				int x = col * ANIMATION_DIMENSION;
-				int y = row * ANIMATION_DIMENSION;
-				int d = ANIMATION_DIMENSION;
-				
-				//create new animation
-				Animation animation = new Animation(Images.getImage(Assets.ImageGameKey.ColorsFlooded), x, y, d, d);
-				
-				//add to sprite sheet
-				entity.getSpritesheet().add(Colors.values()[index], animation);
-				
-				//increase the index
-				index++;
-			}
-		}
-		
 		//set the default animation if possible
 		if (color != null)
 			entity.getSpritesheet().setKey(color);

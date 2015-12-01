@@ -37,9 +37,7 @@ public class Board extends Entity implements IBoard
 	public enum Colors
 	{
 		Orange, Red, Blue,
-		Green, Purple, Yellow,
-		OrangeFlooded, RedFlooded, BlueFlooded,
-		GreenFlooded, PurpleFlooded, YellowFlooded,
+		Green, Purple, Yellow
 	}
 	
 	//the board containing our colors
@@ -172,8 +170,8 @@ public class Board extends Entity implements IBoard
 		setWin(false);
 		
 		//make sure we don't exceed the number of colors available
-		if (total > (Colors.values().length / 2))
-			total = (Colors.values().length / 2);
+		if (total > Colors.values().length)
+			total = Colors.values().length;
 		
 		//store the total number of colors
 		this.total = total;
@@ -330,40 +328,6 @@ public class Board extends Entity implements IBoard
 					
 					//assign animation
 					getSpritesheet().setKey(getKey()[row][col].getColor());
-					
-					//if the square is flooded we will render a different animation
-					if (getKey()[row][col].isFlooded())
-					{
-						switch (getKey()[row][col].getColor())
-						{
-							case Orange:
-								getSpritesheet().setKey(Colors.OrangeFlooded);
-								break;
-								
-							case Red:
-								getSpritesheet().setKey(Colors.RedFlooded);
-								break;
-								
-							case Blue:
-								getSpritesheet().setKey(Colors.BlueFlooded);
-								break;
-								
-							case Green:
-								getSpritesheet().setKey(Colors.GreenFlooded);
-								break;
-								
-							case Purple:
-								getSpritesheet().setKey(Colors.PurpleFlooded);
-								break;
-								
-							case Yellow:
-								getSpritesheet().setKey(Colors.YellowFlooded);
-								break;
-								
-							default:
-								throw new Exception("Color not setup here: " + getKey()[row][col].getColor());
-						}
-					}
 					
 					//render the current animation
 					super.render(canvas);

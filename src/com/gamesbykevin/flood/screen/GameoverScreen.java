@@ -49,7 +49,7 @@ public class GameoverScreen implements Screen, Disposable
     /**
      * The text to display for the new game
      */
-    private static final String BUTTON_TEXT_NEW_GAME = "New";
+    private static final String BUTTON_TEXT_NEW_GAME = "Next";
     
     /**
      * The text to display to retry

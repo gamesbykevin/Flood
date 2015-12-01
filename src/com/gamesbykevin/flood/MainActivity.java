@@ -22,15 +22,15 @@ public class MainActivity extends Activity
     /**
      * The web address where this game can be rated
      */
-    public static final String WEBPAGE_RATE_URL = "http://gamesbykevin.com";
+    public static final String WEBPAGE_RATE_URL = "https://play.google.com/store/apps/details?id=com.gamesbykevin.flood";
 
     /**
      * The url that contains the instructions for the game
      */
-    public static final String WEBPAGE_GAME_INSTRUCTIONS_URL = "http://gamesbykevin.com";
+    public static final String WEBPAGE_GAME_INSTRUCTIONS_URL = "http://gamesbykevin.com/2015/11/30/flood";
     
     /**
-     * The facebook url
+     * The face book url
      */
     public static final String WEBPAGE_FACEBOOK_URL = "http://facebook.com/gamesbykevin";
     

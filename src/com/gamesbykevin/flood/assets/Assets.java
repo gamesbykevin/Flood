@@ -92,7 +92,6 @@ public class Assets
     	AudioOn,
     	Background,
     	Colors,
-    	ColorsFlooded,
     	Exit,
     	LevelComplete,
     	LevelOpen,
