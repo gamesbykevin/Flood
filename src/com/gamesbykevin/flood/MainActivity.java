@@ -27,7 +27,7 @@ public class MainActivity extends Activity
     /**
      * The url that contains the instructions for the game
      */
-    public static final String WEBPAGE_GAME_INSTRUCTIONS_URL = "http://gamesbykevin.com/2015/11/30/flood";
+    public static final String WEBPAGE_GAME_INSTRUCTIONS_URL = "http://gamesbykevin.com/2015/12/02/flood";
     
     /**
      * The face book url

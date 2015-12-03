@@ -118,7 +118,7 @@ public class Switches implements Disposable
 				//play sound effect
 				switch (tmp.getColor())
 				{
-					case Orange:
+					case Green:
 						Audio.play(Assets.AudioGameKey.Switch1);
 						break;
 						
@@ -138,7 +138,7 @@ public class Switches implements Disposable
 						Audio.play(Assets.AudioGameKey.Switch5);
 						break;
 						
-					case Green:
+					case White:
 					default:
 						Audio.play(Assets.AudioGameKey.Switch6);
 						break;

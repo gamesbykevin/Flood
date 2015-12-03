@@ -40,10 +40,11 @@ public class OptionsScreen implements Screen, Disposable
     //buttons to access each button list
     public static final int INDEX_BUTTON_BACK = 0;
     public static final int INDEX_BUTTON_SOUND = 1;
-    public static final int INDEX_BUTTON_COLORS = 2;
-    public static final int INDEX_BUTTON_INSTRUCTIONS = 3;
-    public static final int INDEX_BUTTON_FACEBOOK = 4;
-    public static final int INDEX_BUTTON_TWITTER = 5;
+    public static final int INDEX_BUTTON_VIBRATE = 2;
+    public static final int INDEX_BUTTON_COLORS = 3;
+    public static final int INDEX_BUTTON_INSTRUCTIONS = 4;
+    public static final int INDEX_BUTTON_FACEBOOK = 5;
+    public static final int INDEX_BUTTON_TWITTER = 6;
     
     public OptionsScreen(final ScreenManager screen)
     {
@@ -68,6 +69,10 @@ public class OptionsScreen implements Screen, Disposable
         
         //add sound option
         addButtonSound(x, y);
+        
+        //add vibrate option
+        y += ScreenManager.BUTTON_Y_INCREMENT;
+        addButtonVibrate(x, y);
         
         //add colors option
         y += ScreenManager.BUTTON_Y_INCREMENT;
@@ -163,6 +168,16 @@ public class OptionsScreen implements Screen, Disposable
         button.setY(y);
         this.buttons.put(INDEX_BUTTON_SOUND, button);
     }
+
+    private void addButtonVibrate(final int x, final int y)
+    {
+        Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.addDescription("Vibrate: On");
+        button.addDescription("Vibrate: Off");
+        button.setX(x);
+        button.setY(y);
+    	this.buttons.put(INDEX_BUTTON_VIBRATE, button);
+    }
     
     /**
      * Assign the index.
@@ -204,6 +219,7 @@ public class OptionsScreen implements Screen, Disposable
 						case INDEX_BUTTON_BACK:
 						case INDEX_BUTTON_SOUND:
 						case INDEX_BUTTON_COLORS:
+						case INDEX_BUTTON_VIBRATE:
 							button.positionText(paint);
 							break;
 							
@@ -267,6 +283,19 @@ public class OptionsScreen implements Screen, Disposable
     	                //no need to continue
     	                return false;
     	                
+    				case INDEX_BUTTON_VIBRATE:
+    					//change index
+    					button.setIndex(button.getIndex() + 1);
+    					
+    					//position the text
+    			        button.positionText(paint);
+    					
+    	                //play sound effect
+    	                Audio.play(Assets.AudioMenuKey.Selection);
+    	                
+                        //no need to continue
+                        return false;
+    					
     				case INDEX_BUTTON_SOUND:
     	    			
     					//change index
@@ -302,6 +331,8 @@ public class OptionsScreen implements Screen, Disposable
     					
                         //play sound effect
                         Audio.play(Assets.AudioMenuKey.Selection);
+                        
+                        //no need to continue
     					return false;
                         
     				case INDEX_BUTTON_INSTRUCTIONS:
@@ -371,6 +402,7 @@ public class OptionsScreen implements Screen, Disposable
 	    			case INDEX_BUTTON_BACK:
 	    			case INDEX_BUTTON_SOUND:
 	    			case INDEX_BUTTON_COLORS:
+	    			case INDEX_BUTTON_VIBRATE:
 	    				buttons.get(index).render(canvas, paint);
 	    				break;
 	    				

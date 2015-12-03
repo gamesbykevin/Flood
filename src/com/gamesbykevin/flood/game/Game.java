@@ -1,8 +1,10 @@
 package com.gamesbykevin.flood.game;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Vibrator;
 import android.view.MotionEvent;
 
 import com.gamesbykevin.androidframework.awt.Button;
@@ -12,6 +14,7 @@ import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.flood.assets.Assets;
 import com.gamesbykevin.flood.board.Board;
 import com.gamesbykevin.flood.game.controller.Controller;
+import com.gamesbykevin.flood.panel.GamePanel;
 import com.gamesbykevin.flood.screen.OptionsScreen;
 import com.gamesbykevin.flood.screen.ScreenManager;
 import com.gamesbykevin.flood.screen.ScreenManager.State;
@@ -45,14 +48,28 @@ public final class Game implements IGame
     public static final int DEFAULT_DIMENSION = 5;
     
     //the location where we display the attempts
-    private static final int ATTEMPT_X = 325;
+    private static final int ATTEMPT_X = 310;
     private static final int ATTEMPT_Y = 75;
+    
+    /**
+     * The length to vibrate the phone when you beat a level
+     */
+    private static final long VIBRATION_DURATION = 300;
     
     //our level select object
     private Select levelSelect;
     
     //the game score card
     private ScoreCard scoreCard;
+    
+    //level select information
+    private static final int LEVEL_SELECT_COLS = 4;
+    private static final int LEVEL_SELECT_ROWS = 5;
+    private static final int LEVEL_SELECT_DIMENSION = 96;
+    private static final int LEVEL_SELECT_PADDING = 25;
+    private static final int LEVEL_SELECT_START_X = (GamePanel.WIDTH / 2) - (((LEVEL_SELECT_COLS * LEVEL_SELECT_DIMENSION) + ((LEVEL_SELECT_COLS - 1) * LEVEL_SELECT_PADDING)) / 2);
+    private static final int LEVEL_SELECT_START_Y = 25;
+    private static final int LEVEL_SELECT_TOTAL = 60;
     
     /**
      * Create our game object
@@ -82,14 +99,14 @@ public final class Game implements IGame
         this.levelSelect.setButtonOpen(new Button(Images.getImage(Assets.ImageGameKey.LevelOpen)));
         this.levelSelect.setButtonPrevious(new Button(Images.getImage(Assets.ImageGameKey.PagePrevious)));
         this.levelSelect.setButtonSolved(new Button(Images.getImage(Assets.ImageGameKey.LevelComplete)));
-        this.levelSelect.setCols(3);
-        this.levelSelect.setRows(4);
-        this.levelSelect.setDimension(120);
-        this.levelSelect.setPadding(30);
-        this.levelSelect.setStartX(30);
-        this.levelSelect.setStartY(25);
-        this.levelSelect.setTotal(26);
-        
+        this.levelSelect.setCols(LEVEL_SELECT_COLS);
+        this.levelSelect.setRows(LEVEL_SELECT_ROWS);
+        this.levelSelect.setDimension(LEVEL_SELECT_DIMENSION);
+        this.levelSelect.setPadding(LEVEL_SELECT_PADDING);
+        this.levelSelect.setStartX(LEVEL_SELECT_START_X);
+        this.levelSelect.setStartY(LEVEL_SELECT_START_Y);
+        this.levelSelect.setTotal(LEVEL_SELECT_TOTAL);
+
         //create our score card
         this.scoreCard = new ScoreCard(this, screen.getPanel().getActivity());
     }
@@ -261,7 +278,7 @@ public final class Game implements IGame
         		if (getBoard().getAttempts() >= getBoard().getMax())
         		{
         			//set losing message
-        			getScreen().getScreenGameover().setMessage("No more attempts");
+        			getScreen().getScreenGameover().setMessage("You Lose!");
         			
             		//go to game over state
             		getScreen().setState(State.GameOver);
@@ -294,6 +311,16 @@ public final class Game implements IGame
         		
         		//play sound effect
         		Audio.play(Assets.AudioGameKey.Win);
+        		
+        		//make sure vibrate is enabled
+        		if (getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_VIBRATE) == 0)
+        		{
+	        		//get our vibrate object
+	        		Vibrator v = (Vibrator) getScreen().getPanel().getActivity().getSystemService(Context.VIBRATOR_SERVICE);
+	        		 
+					//vibrate for a specified amount of milliseconds
+					v.vibrate(VIBRATION_DURATION);
+        		}
         	}
         }
     }
@@ -323,17 +350,21 @@ public final class Game implements IGame
     	{
     		getBoard().render(canvas);
     	
-	    	//render the controller
-	    	if (getController() != null)
-	    		getController().render(canvas);
-	    	
-	    	//render the number of remaining attempts
-	    	canvas.drawText(
-	    		"Remaining - " + (getBoard().getMax() - getBoard().getAttempts()), 
-	    		ATTEMPT_X, 
-	    		ATTEMPT_Y, 
-	    		getScreen().getPaint()
-	    	);
+    		//only render the info and controller if the board has been created
+    		if (getBoard().isGenerated())
+    		{
+		    	//render the controller
+		    	if (getController() != null)
+		    		getController().render(canvas);
+		    	
+		    	//render the number of remaining attempts
+		    	canvas.drawText(
+		    		"Remaining - " + (getBoard().getMax() - getBoard().getAttempts()), 
+		    		ATTEMPT_X, 
+		    		ATTEMPT_Y, 
+		    		getScreen().getPaint()
+		    	);
+    		}
     	}
     }
     

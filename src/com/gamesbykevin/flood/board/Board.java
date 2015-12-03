@@ -36,8 +36,8 @@ public class Board extends Entity implements IBoard
 	 */
 	public enum Colors
 	{
-		Orange, Red, Blue,
-		Green, Purple, Yellow
+		Green, Red, Blue,
+		White, Purple, Yellow
 	}
 	
 	//the board containing our colors
@@ -302,6 +302,15 @@ public class Board extends Entity implements IBoard
 	}
 	
 	/**
+	 * Has the board been generated?
+	 * @return true = yes, false = no
+	 */
+	public boolean isGenerated()
+	{
+		return this.generated;
+	}
+	
+	/**
 	 * Render the board
 	 * @param canvas
 	 * @throws Exception
@@ -310,7 +319,7 @@ public class Board extends Entity implements IBoard
 	public void render(final Canvas canvas) throws Exception
 	{
 		//if the game has not been generated render loading screen
-		if (!generated)
+		if (!isGenerated())
 		{
 			//render loading screen
 			canvas.drawBitmap(Images.getImage(Assets.ImageMenuKey.Splash), 0, 0, null);
@@ -334,8 +343,9 @@ public class Board extends Entity implements IBoard
 				}
 			}
 			
-			//render the switches
-			getSwitches().render(canvas);
+			//render the switches as long as we still have attempts and the game has not been solved
+			if (getAttempts() < getMax() && !BoardHelper.hasWin(getKey()))
+				getSwitches().render(canvas);
 		}
 	}
 }
