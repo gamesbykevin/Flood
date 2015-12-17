@@ -140,10 +140,6 @@ public class Controller implements IController
                 	OptionsScreen.INDEX_BUTTON_SOUND, 
                 	getGame().getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_SOUND) + 1
                 );
-                
-                //if audio enabled, play music
-                //if (Audio.isAudioEnabled())
-                    //Assets.playMusic();
             }
         }
     }

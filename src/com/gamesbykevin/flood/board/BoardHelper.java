@@ -147,14 +147,10 @@ public final class BoardHelper
 					//get the current square
 					Square square = squares[row][col];
 					
-					//if we were able to join any neighbor, flag complete false
+					//if we were able to join a neighbor, flag complete as false
 					if (join(squares, square, col - 1, row))
 						complete = false;
-					if (join(squares, square, col + 1, row))
-						complete = false;
 					if (join(squares, square, col, row - 1))
-						complete = false;
-					if (join(squares, square, col, row + 1))
 						complete = false;
 				}
 			}

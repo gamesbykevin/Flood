@@ -162,8 +162,8 @@ public class OptionsScreen implements Screen, Disposable
     private void addButtonSound(final int x, final int y)
     {
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
-        button.addDescription("Sound: Enabled");
-        button.addDescription("Sound: Disabled");
+        button.addDescription("Sound: On");
+        button.addDescription("Sound: Off");
         button.setX(x);
         button.setY(y);
         this.buttons.put(INDEX_BUTTON_SOUND, button);
@@ -416,7 +416,6 @@ public class OptionsScreen implements Screen, Disposable
 	    				throw new Exception("Button with index not setup here: " + index);
     			}
     		}
-    			
     	}
     }
     

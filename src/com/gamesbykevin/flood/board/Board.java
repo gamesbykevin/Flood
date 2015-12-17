@@ -1,8 +1,6 @@
 package com.gamesbykevin.flood.board;
 
 import com.gamesbykevin.androidframework.base.Entity;
-import com.gamesbykevin.androidframework.resources.Images;
-import com.gamesbykevin.flood.assets.Assets;
 import com.gamesbykevin.flood.board.switches.Switch;
 import com.gamesbykevin.flood.board.switches.Switches;
 import com.gamesbykevin.flood.panel.GamePanel;
@@ -117,8 +115,11 @@ public class Board extends Entity implements IBoard
 		if (hasWin())
 			return;
 		
-		//update the switches
-		getSwitches().update(this);
+		if (isGenerated())
+		{
+			//update the switches
+			getSwitches().update(this);
+		}
 	}
 	
 	@Override
@@ -186,7 +187,10 @@ public class Board extends Entity implements IBoard
 		//create new key first
 		this.key = new Square[size][size];
 		
-		//make sure we have a board that contains each of the available colors
+		//assign the max number of allowed attempts depending on the size and # of different colors
+		setMax((int)Math.ceil(25 * ((size + size) * getTotal()) / 168) + 2);
+		
+		//continue to loop until board is created using all in play colors
 		while (true)
 		{
 			//pick random color
@@ -202,13 +206,10 @@ public class Board extends Entity implements IBoard
 				}
 			}
 			
-			//if the board has each of the unique colors for this game, we can exit loop
+			//make sure that each color is used on the board
 			if (BoardHelper.getUniqueColorCount(getKey()) >= getTotal())
 				break;
 		}
-		
-		//assign the max number of allowed attempts depending on the size and # of different colors
-		setMax((int)Math.ceil(25 * ((size + size) * getTotal()) / 168) + 2);
 		
 		//assign the current color as the start location
 		setCurrent(getKey()[0][0].getColor());
@@ -318,34 +319,29 @@ public class Board extends Entity implements IBoard
 	@Override
 	public void render(final Canvas canvas) throws Exception
 	{
-		//if the game has not been generated render loading screen
+		//if the game has not been generated we won't continue
 		if (!isGenerated())
+			return;
+		
+		//check every square
+		for (int row = 0; row < getKey().length; row++)
 		{
-			//render loading screen
-			canvas.drawBitmap(Images.getImage(Assets.ImageMenuKey.Splash), 0, 0, null);
-		}
-		else
-		{
-			//check every square
-			for (int row = 0; row < getKey().length; row++)
+			for (int col = 0; col < getKey()[0].length; col++)
 			{
-				for (int col = 0; col < getKey()[0].length; col++)
-				{
-					//assign coordinates
-					setX(BOUNDS.left + (col * getDimension()));
-					setY(BOUNDS.top + (row * getDimension()));
-					
-					//assign animation
-					getSpritesheet().setKey(getKey()[row][col].getColor());
-					
-					//render the current animation
-					super.render(canvas);
-				}
+				//assign coordinates
+				setX(BOUNDS.left + (col * getDimension()));
+				setY(BOUNDS.top + (row * getDimension()));
+				
+				//assign animation
+				getSpritesheet().setKey(getKey()[row][col].getColor());
+				
+				//render the current animation
+				super.render(canvas);
 			}
-			
-			//render the switches as long as we still have attempts and the game has not been solved
-			if (getAttempts() < getMax() && !BoardHelper.hasWin(getKey()))
-				getSwitches().render(canvas);
 		}
+		
+		//render the switches as long as we still have attempts and the game has not been solved
+		if (getAttempts() < getMax() && !BoardHelper.hasWin(getKey()))
+			getSwitches().render(canvas);
 	}
 }

@@ -42,6 +42,9 @@ public final class Game implements IGame
     //is the game being reset
     private boolean reset = false;
     
+    //has the player been notified (has the user seen the loading screen)
+    private boolean notify = false;
+    
     /**
      * Default starting size
      */
@@ -162,6 +165,18 @@ public final class Game implements IGame
         //flag reset
     	setReset(true);
     	
+    	//update the level select to mark the completed level
+    	updateLevelSelect();
+        
+        //flag board generated false
+        getBoard().setGenerated(false);
+    }
+    
+    /**
+     * Update the level select object to flag completed levels
+     */
+    private void updateLevelSelect()
+    {
         //load the saved data
         for (int levelIndex = 0; levelIndex < getLevelSelect().getTotal(); levelIndex++)
         {
@@ -171,18 +186,19 @@ public final class Game implements IGame
         	//mark completed if the score object exists
         	getLevelSelect().setCompleted(levelIndex, (score != null));
         }
-        
-        //flag board generated false
-        getBoard().setGenerated(false);
     }
     
     /**
-     * Flag reset
+     * Flag reset, we also will flag notify to false if reset is true
      * @param reset true to reset the game, false otherwise
      */
     private void setReset(final boolean reset)
     {
     	this.reset = reset;
+    	
+    	//flag that the user has not been notified, since we are resetting
+    	if (hasReset())
+    		this.notify = false;
     }
     
     /**
@@ -227,11 +243,15 @@ public final class Game implements IGame
     	if (hasReset())
     		return;
     	
-        //update the following
-        if (getController() != null)
-        	getController().update(event, x, y);
-        if (getBoard() != null)
-        	getBoard().update(event, x, y);
+    	//make sure the board is generated before interacting
+    	if (getBoard().isGenerated())
+    	{
+	        //update the following
+	        if (getController() != null)
+	        	getController().update(event, x, y);
+	        if (getBoard() != null)
+	        	getBoard().update(event, x, y);
+    	}
     }
     
     /**
@@ -256,18 +276,22 @@ public final class Game implements IGame
         //if we are to reset the game
         if (hasReset())
         {
-        	//flag reset false
-        	setReset(false);
-        	
-        	//reset controller
-        	if (getController() != null)
-        		getController().reset();
-        	
-        	//reset with the specified size and colors
-    		getBoard().reset(
-				getLevelSelect().getLevelIndex() + DEFAULT_DIMENSION, 
-    			getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_COLORS) + 3
-    		);
+        	//make sure we have notified first
+        	if (notify)
+        	{
+	        	//flag reset false
+	        	setReset(false);
+	        	
+	        	//reset controller
+	        	if (getController() != null)
+	        		getController().reset();
+	        	
+	        	//reset with the specified size and colors
+	    		getBoard().reset(
+					getLevelSelect().getLevelIndex() + DEFAULT_DIMENSION, 
+	    			getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_COLORS) + 3
+	    		);
+        	}
         }
         else
         {
@@ -321,6 +345,9 @@ public final class Game implements IGame
 					//vibrate for a specified amount of milliseconds
 					v.vibrate(VIBRATION_DURATION);
         		}
+        		
+        		//update level select screen
+        		updateLevelSelect();
         	}
         }
     }
@@ -348,11 +375,12 @@ public final class Game implements IGame
     	//render the board and switches
     	if (getBoard() != null)
     	{
-    		getBoard().render(canvas);
-    	
     		//only render the info and controller if the board has been created
     		if (getBoard().isGenerated())
     		{
+    			//render the board
+    			getBoard().render(canvas);
+    			
 		    	//render the controller
 		    	if (getController() != null)
 		    		getController().render(canvas);
@@ -364,6 +392,14 @@ public final class Game implements IGame
 		    		ATTEMPT_Y, 
 		    		getScreen().getPaint()
 		    	);
+    		}
+    		else
+    		{
+    			//render loading screen
+    			canvas.drawBitmap(Images.getImage(Assets.ImageMenuKey.Splash), 0, 0, null);
+    			
+    			//flag that the user has been notified
+    			notify = true;
     		}
     	}
     }

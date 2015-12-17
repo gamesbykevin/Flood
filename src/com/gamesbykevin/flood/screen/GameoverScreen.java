@@ -61,6 +61,11 @@ public class GameoverScreen implements Screen, Disposable
      */
     private static final String BUTTON_TEXT_MENU = "Menu";
     
+    /**
+     * The text to display for the menu
+     */
+    private static final String BUTTON_TEXT_LEVEL_SELECT = "Level Select";
+    
     //list of buttons
     private SparseArray<Button> buttons;
     
@@ -69,6 +74,7 @@ public class GameoverScreen implements Screen, Disposable
     public static final int INDEX_BUTTON_REPLAY = 1;
     public static final int INDEX_BUTTON_MENU = 2;
     public static final int INDEX_BUTTON_RATE = 3;
+    public static final int INDEX_BUTTON_LEVEL_SELECT = 4;
     
     public GameoverScreen(final ScreenManager screen)
     {
@@ -87,6 +93,9 @@ public class GameoverScreen implements Screen, Disposable
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         addButton(x, y, INDEX_BUTTON_REPLAY, BUTTON_TEXT_REPLAY);
+        
+        y += ScreenManager.BUTTON_Y_INCREMENT;
+        addButton(x, y, INDEX_BUTTON_LEVEL_SELECT, BUTTON_TEXT_LEVEL_SELECT);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         addButton(x, y, INDEX_BUTTON_MENU, BUTTON_TEXT_MENU);
@@ -212,7 +221,9 @@ public class GameoverScreen implements Screen, Disposable
 	        		case INDEX_BUTTON_NEW:
 	                    
 	                    //move to the next level
-	                    screen.getScreenGame().getGame().getLevelSelect().setLevelIndex(screen.getScreenGame().getGame().getLevelSelect().getLevelIndex() + 1);
+	                    screen.getScreenGame().getGame().getLevelSelect().setLevelIndex(
+	                    	screen.getScreenGame().getGame().getLevelSelect().getLevelIndex() + 1
+	                    );
 	                    
 	                    //reset with the same settings
 	                    screen.getScreenGame().getGame().reset();
@@ -240,6 +251,20 @@ public class GameoverScreen implements Screen, Disposable
 	                    //we don't request additional motion events
 	                    return false;
 	        			
+	        		case INDEX_BUTTON_LEVEL_SELECT:
+	                    
+	                    //flag no level selection
+	                    screen.getScreenGame().getGame().getLevelSelect().setSelection(false);
+	                    
+	                    //move back to the game
+	                    screen.setState(ScreenManager.State.Running);
+	                    
+	                    //play sound effect
+	                    Audio.play(Assets.AudioMenuKey.Selection);
+	                    
+	                    //we don't request additional motion events
+	                    return false;
+	                    
 	        		case INDEX_BUTTON_MENU:
 	                    
 	                    //move to the main menu

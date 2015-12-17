@@ -132,6 +132,7 @@ public class MenuScreen implements Screen, Disposable
         //add social media icons
         addIcons();
         
+        //set the size and bounds of the buttons
         for (Key key : Key.values())
         {
         	//get the current button
