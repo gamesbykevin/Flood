@@ -372,8 +372,6 @@ public class OptionsScreen implements Screen, Disposable
                     	throw new Exception("Key not setup here: " + key);
 				}
         	}
-        	
-        	
         }
     	
         //return true
