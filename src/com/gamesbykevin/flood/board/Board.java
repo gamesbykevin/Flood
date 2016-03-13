@@ -99,13 +99,13 @@ public class Board extends Entity implements IBoard
 	}
 	
 	@Override
-	public void update(final MotionEvent event, final float x, final float y)
+	public void update(final int action, final float x, final float y)
 	{
 		//don't continue if we already have the win
 		if (hasWin())
 			return;
 		
-		if (event.getAction() == MotionEvent.ACTION_UP)
+		if (action == MotionEvent.ACTION_UP)
 			getSwitches().update(x, y);
 	}
 	
@@ -188,7 +188,7 @@ public class Board extends Entity implements IBoard
 		this.key = new Square[size][size];
 		
 		//assign the max number of allowed attempts depending on the size and # of different colors
-		setMax((int)Math.ceil(25 * ((size + size) * getTotal()) / 168) + 2);
+		setMax((int)Math.ceil(25 * ((size + size) * getTotal()) / 168) + 1);
 		
 		//continue to loop until board is created using all in play colors
 		while (true)
@@ -215,7 +215,10 @@ public class Board extends Entity implements IBoard
 		setCurrent(getKey()[0][0].getColor());
 		
 		//mark the start location as flooded
-		getKey()[0][0].setFlooded(true);
+		BoardHelper.floodSquare(getKey()[0][0], getKey()[0][0]);
+		
+		//flood the opposite corner
+		BoardHelper.floodSquare(getKey()[0][0], getKey()[key.length - 1][key[0].length - 1]);
 		
 		//give the neighbor squares that have a matching color the same id
 		BoardHelper.groupSquares(getKey());
@@ -261,7 +264,7 @@ public class Board extends Entity implements IBoard
 	 * Get our switches
 	 * @return The switch buttons used to play the game
 	 */
-	private Switches getSwitches()
+	public Switches getSwitches()
 	{
 		return this.switches;
 	}
@@ -312,6 +315,15 @@ public class Board extends Entity implements IBoard
 	}
 	
 	/**
+	 * Can we render the switches?
+	 * @return true if we have not yet reached the number of attempts and the board is not yet won, false otherwise
+	 */
+	public boolean canRenderSwitches()
+	{
+		return (getAttempts() < getMax() && !BoardHelper.hasWin(getKey()));
+	}
+	
+	/**
 	 * Render the board
 	 * @param canvas
 	 * @throws Exception
@@ -339,9 +351,5 @@ public class Board extends Entity implements IBoard
 				super.render(canvas);
 			}
 		}
-		
-		//render the switches as long as we still have attempts and the game has not been solved
-		if (getAttempts() < getMax() && !BoardHelper.hasWin(getKey()))
-			getSwitches().render(canvas);
 	}
 }

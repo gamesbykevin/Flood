@@ -94,7 +94,10 @@ public class Assets
     	Colors,
     	Exit,
     	LevelComplete,
+    	LevelLocked,
     	LevelOpen,
+    	Message,
+    	Numbers,
     	PageNext,
     	PagePrevious,
     	Pause
@@ -124,7 +127,7 @@ public class Assets
      */
     public enum AudioGameKey
     {
-    	Lose, Switch1, Switch2, Switch3, Switch4, Switch5, Switch6, Win
+    	InvalidLevelSelect, Lose, Switch1, Switch2, Switch3, Switch4, Switch5, Switch6, Win
     }
     
     /**

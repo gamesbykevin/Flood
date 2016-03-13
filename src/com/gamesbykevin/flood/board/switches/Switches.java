@@ -26,6 +26,11 @@ public class Switches implements Disposable
 	 */
 	private static final int SWITCH_PADDING = 15;
 	
+	/**
+	 * The y-coordinate where the switches are rendered
+	 */
+	private static final int SWITCH_Y = 676;
+	
 	//the number of attempts
 	private int attempts = 0;
 	
@@ -194,9 +199,8 @@ public class Switches implements Disposable
 		//create new array for the button switches
 		this.switches = new Switch[total];
 		
-		//calculate the start coordinates
+		//calculate the start coordinate
 		int x = (GamePanel.WIDTH / 2) - (((total * SWITCH_DIMENSION) + ((total - 1) * SWITCH_PADDING)) / 2);
-		final int y = Board.BOUNDS.bottom + (int)(dimension * 1.25);
 
 		//render the buttons
 		for (int index = 0; index < total; index++)
@@ -209,7 +213,7 @@ public class Switches implements Disposable
 			
 			//set location
 			this.switches[index].setX(x);
-			this.switches[index].setY(y);
+			this.switches[index].setY(SWITCH_Y);
 			
 			//set the dimensions
 			this.switches[index].setWidth(SWITCH_DIMENSION);

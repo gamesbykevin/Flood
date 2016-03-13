@@ -111,10 +111,10 @@ public class Controller implements IController
      * @return true if motion event was applied, false otherwise
      * @throws Exception
      */
-    public void update(final MotionEvent event, final float x, final float y) throws Exception
+    public void update(final int action, final float x, final float y) throws Exception
     {
         //check if the touch screen was released
-        if (event.getAction() == MotionEvent.ACTION_UP)
+        if (action == MotionEvent.ACTION_UP)
         {
             //check if the player hit the controller
             if (buttons.get(Assets.ImageGameKey.Pause).contains(x, y))

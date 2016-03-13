@@ -107,20 +107,32 @@ public final class BoardHelper
 				//get the current square
 				Square square = squares[row][col]; 
 				
-				//if the square has the same id
+				//make sure the squre has the matching group
 				if (square.hasId(id))
 				{
-					//flag as flooded
-					square.setFlooded(true);
-					
-					//change the color
-					square.setColor(current.getColor());
-					
-					//it will belong to the new group
-					square.setId(current);
+					//flood the single square
+					floodSquare(current, square);
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Flood a single square
+	 * @param parent The square we are to copy from
+	 * @param child The desired square we want to flood
+	 */
+	public static void floodSquare(final Square parent, final Square child)
+	{
+		//flag child as flooded
+		child.setFlooded(true);
+		
+		//change the color of the child to match the parent
+		child.setColor(parent.getColor());
+		
+		//the child will belong to the parent group
+		child.setId(parent);
+		
 	}
 	
 	/**

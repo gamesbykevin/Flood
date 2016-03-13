@@ -1,8 +1,6 @@
 package com.gamesbykevin.flood.game.controller;
 
 import android.graphics.Canvas;
-import android.view.MotionEvent;
-
 import com.gamesbykevin.androidframework.resources.Disposable;
 
 /**
@@ -18,7 +16,7 @@ public interface IController extends Disposable
      * @param y y-coordinate
      * @throws Exception
      */
-    public void update(final MotionEvent event, final float x, final float y) throws Exception;
+    public void update(final int action, final float x, final float y) throws Exception;
     
     /**
      * Logic to update at runtime, separate from the motion event

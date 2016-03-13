@@ -49,12 +49,12 @@ public class GameoverScreen implements Screen, Disposable
     /**
      * The text to display for the new game
      */
-    private static final String BUTTON_TEXT_NEW_GAME = "Next";
+    public static final String BUTTON_TEXT_NEW_GAME = "Next";
     
     /**
      * The text to display to retry
      */
-    private static final String BUTTON_TEXT_REPLAY = "Retry";
+    public static final String BUTTON_TEXT_REPLAY = "Retry";
     
     /**
      * The text to display for the menu
@@ -64,17 +64,16 @@ public class GameoverScreen implements Screen, Disposable
     /**
      * The text to display for the menu
      */
-    private static final String BUTTON_TEXT_LEVEL_SELECT = "Level Select";
+    private static final String BUTTON_TEXT_LEVEL_SELECT = "Level";
     
     //list of buttons
     private SparseArray<Button> buttons;
     
     //buttons to access each button list
-    public static final int INDEX_BUTTON_NEW = 0;
-    public static final int INDEX_BUTTON_REPLAY = 1;
-    public static final int INDEX_BUTTON_MENU = 2;
-    public static final int INDEX_BUTTON_RATE = 3;
-    public static final int INDEX_BUTTON_LEVEL_SELECT = 4;
+    public static final int INDEX_BUTTON_NEXT = 0;
+    public static final int INDEX_BUTTON_MENU = 1;
+    public static final int INDEX_BUTTON_RATE = 2;
+    public static final int INDEX_BUTTON_LEVEL_SELECT = 3;
     
     public GameoverScreen(final ScreenManager screen)
     {
@@ -89,10 +88,7 @@ public class GameoverScreen implements Screen, Disposable
         int x = ScreenManager.BUTTON_X;
 
         //create our buttons
-        addButton(x, y, INDEX_BUTTON_NEW, BUTTON_TEXT_NEW_GAME);
-        
-        y += ScreenManager.BUTTON_Y_INCREMENT;
-        addButton(x, y, INDEX_BUTTON_REPLAY, BUTTON_TEXT_REPLAY);
+        addButton(x, y, INDEX_BUTTON_NEXT, BUTTON_TEXT_NEW_GAME);
         
         y += ScreenManager.BUTTON_Y_INCREMENT;
         addButton(x, y, INDEX_BUTTON_LEVEL_SELECT, BUTTON_TEXT_LEVEL_SELECT);
@@ -149,11 +145,18 @@ public class GameoverScreen implements Screen, Disposable
     /**
      * Assign the message
      * @param message The message we want displayed
+     * @param buttonText the button text to display
      */
-    public void setMessage(final String message)
+    public void setMessage(final String message, final String buttonText)
     {
         //assign the message
         this.message = message;
+        
+        //update button text
+        this.buttons.get(INDEX_BUTTON_NEXT).setDescription(0, buttonText);
+        
+        //align button text
+        this.buttons.get(INDEX_BUTTON_NEXT).positionText(screen.getPaint());
         
         //create temporary rectangle
         Rect tmp = new Rect();
@@ -195,13 +198,13 @@ public class GameoverScreen implements Screen, Disposable
     }
     
     @Override
-    public boolean update(final MotionEvent event, final float x, final float y) throws Exception
+    public boolean update(final int action, final float x, final float y) throws Exception
     {
         //if we aren't displaying the menu, return false
         if (!hasDisplay())
             return false;
         
-        if (event.getAction() == MotionEvent.ACTION_UP)
+        if (action == MotionEvent.ACTION_UP)
         {
         	for (int index = 0; index < buttons.size(); index++)
         	{
@@ -213,44 +216,45 @@ public class GameoverScreen implements Screen, Disposable
         			continue;
         		
                 //remove message
-                setMessage("");
+                setMessage("", "");
                 
         		//handle each button different
         		switch (index)
         		{
-	        		case INDEX_BUTTON_NEW:
+	        		case INDEX_BUTTON_NEXT:
 	                    
-	                    //move to the next level
-	                    screen.getScreenGame().getGame().getLevelSelect().setLevelIndex(
-	                    	screen.getScreenGame().getGame().getLevelSelect().getLevelIndex() + 1
-	                    );
-	                    
-	                    //reset with the same settings
-	                    screen.getScreenGame().getGame().reset();
-	                    
-	                    //move back to the game
-	                    screen.setState(ScreenManager.State.Running);
-	                    
-	                    //play sound effect
-	                    Audio.play(Assets.AudioMenuKey.Selection);
+	        			//if we have the win this button will behave differently
+	        			if (screen.getScreenGame().getGame().getBoard().hasWin())
+	        			{
+		                    //move to the next level
+		                    screen.getScreenGame().getGame().getLevelSelect().setLevelIndex(
+		                    	screen.getScreenGame().getGame().getLevelSelect().getLevelIndex() + 1
+		                    );
+		                    
+		                    //reset with the same settings
+		                    screen.getScreenGame().getGame().reset();
+		                    
+		                    //move back to the game
+		                    screen.setState(ScreenManager.State.Running);
+		                    
+		                    //play sound effect
+		                    Audio.play(Assets.AudioMenuKey.Selection);
+	        			}
+	        			else
+	        			{
+		                    //reset with the same settings
+		                    screen.getScreenGame().getGame().reset();
+		                    
+		                    //move back to the game
+		                    screen.setState(ScreenManager.State.Running);
+		                    
+		                    //play sound effect
+		                    Audio.play(Assets.AudioMenuKey.Selection);
+	        			}
 	                    
 	                    //we don't request additional motion events
 	                    return false;
 
-	        		case INDEX_BUTTON_REPLAY:
-	                    
-	                    //reset with the same settings
-	                    screen.getScreenGame().getGame().reset();
-	                    
-	                    //move back to the game
-	                    screen.setState(ScreenManager.State.Running);
-	                    
-	                    //play sound effect
-	                    Audio.play(Assets.AudioMenuKey.Selection);
-	                    
-	                    //we don't request additional motion events
-	                    return false;
-	        			
 	        		case INDEX_BUTTON_LEVEL_SELECT:
 	                    
 	                    //flag no level selection

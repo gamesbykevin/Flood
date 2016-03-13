@@ -14,7 +14,9 @@ import com.gamesbykevin.androidframework.resources.Images;
 import com.gamesbykevin.flood.assets.Assets;
 import com.gamesbykevin.flood.board.Board;
 import com.gamesbykevin.flood.game.controller.Controller;
+import com.gamesbykevin.flood.number.Number;
 import com.gamesbykevin.flood.panel.GamePanel;
+import com.gamesbykevin.flood.screen.GameoverScreen;
 import com.gamesbykevin.flood.screen.OptionsScreen;
 import com.gamesbykevin.flood.screen.ScreenManager;
 import com.gamesbykevin.flood.screen.ScreenManager.State;
@@ -45,19 +47,28 @@ public final class Game implements IGame
     //has the player been notified (has the user seen the loading screen)
     private boolean notify = false;
     
+    //our object reference for the number of remaining attempts
+    private Number number;
+    
     /**
      * Default starting size
      */
     public static final int DEFAULT_DIMENSION = 5;
     
-    //the location where we display the attempts
-    private static final int ATTEMPT_X = 310;
-    private static final int ATTEMPT_Y = 75;
+    /**
+     * The x-coordinate where we display the attempts
+     */
+    public static final int ATTEMPT_X = 320;
+    
+    /**
+     * The y-coordinate where we display the attempts
+     */
+    public static final int ATTEMPT_Y = 20;
     
     /**
      * The length to vibrate the phone when you beat a level
      */
-    private static final long VIBRATION_DURATION = 300;
+    private static final long VIBRATION_DURATION = 500;
     
     //our level select object
     private Select levelSelect;
@@ -72,7 +83,15 @@ public final class Game implements IGame
     private static final int LEVEL_SELECT_PADDING = 25;
     private static final int LEVEL_SELECT_START_X = (GamePanel.WIDTH / 2) - (((LEVEL_SELECT_COLS * LEVEL_SELECT_DIMENSION) + ((LEVEL_SELECT_COLS - 1) * LEVEL_SELECT_PADDING)) / 2);
     private static final int LEVEL_SELECT_START_Y = 25;
-    private static final int LEVEL_SELECT_TOTAL = 60;
+    private static final int LEVEL_SELECT_TOTAL = 100;
+    
+    //are we starting for the first time?
+    private boolean start = true;
+    
+    /**
+     * How much we darken the background when we render the hint text
+     */
+    private static final int HINT_TEXT_ALPHA_BACKGROUND = 210;
     
     /**
      * Create our game object
@@ -100,6 +119,7 @@ public final class Game implements IGame
         this.levelSelect = new Select();
         this.levelSelect.setButtonNext(new Button(Images.getImage(Assets.ImageGameKey.PageNext)));
         this.levelSelect.setButtonOpen(new Button(Images.getImage(Assets.ImageGameKey.LevelOpen)));
+        this.levelSelect.setButtonLocked(new Button(Images.getImage(Assets.ImageGameKey.LevelLocked)));
         this.levelSelect.setButtonPrevious(new Button(Images.getImage(Assets.ImageGameKey.PagePrevious)));
         this.levelSelect.setButtonSolved(new Button(Images.getImage(Assets.ImageGameKey.LevelComplete)));
         this.levelSelect.setCols(LEVEL_SELECT_COLS);
@@ -112,6 +132,18 @@ public final class Game implements IGame
 
         //create our score card
         this.scoreCard = new ScoreCard(this, screen.getPanel().getActivity());
+        
+        //the object to render the remaining attempts
+        this.number = new Number();
+    }
+    
+    /**
+     * Get the number
+     * @return The number object used to render numbers
+     */
+    public Number getNumber()
+    {
+    	return this.number;
     }
     
     /**
@@ -173,19 +205,47 @@ public final class Game implements IGame
     }
     
     /**
-     * Update the level select object to flag completed levels
+     * Update the level select object to flag completed levels and locked levels
      */
     private void updateLevelSelect()
     {
+    	//flag start true to start
+    	this.start = true;
+    	
         //load the saved data
-        for (int levelIndex = 0; levelIndex < getLevelSelect().getTotal(); levelIndex++)
+        for (int levelIndex = getLevelSelect().getTotal() - 1; levelIndex >= 0; levelIndex--)
         {
         	//get the score for the specified level and colors
         	Score score = getScorecard().getScore(levelIndex, screen.getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_COLORS));
         	
-        	//mark completed if the score object exists
-        	getLevelSelect().setCompleted(levelIndex, (score != null));
+        	//if a score exists
+        	if (score != null)
+        	{
+        		//we have started previous
+        		this.start = false;
+        		
+        		//mark this level as completed
+        		getLevelSelect().setCompleted(levelIndex, true);
+        		
+        		//mark this level as not locked
+        		getLevelSelect().setLocked(levelIndex, false);
+        		
+        		//also make sure the next level is not locked as well
+        		if (levelIndex < getLevelSelect().getTotal() - 1)
+        			getLevelSelect().setLocked(levelIndex + 1, false);
+        	}
+        	else
+        	{
+        		//mark this level as locked
+        		getLevelSelect().setLocked(levelIndex, true);
+        		
+        		//mark this level as not completed
+        		getLevelSelect().setCompleted(levelIndex, false);
+        	}
         }
+        
+    	//the first level can never be locked
+    	getLevelSelect().setLocked(0, false);
     }
     
     /**
@@ -226,13 +286,13 @@ public final class Game implements IGame
      * @param y (y-coordinate)
      * @throws Exception
      */
-    public void update(final MotionEvent event, final float x, final float y) throws Exception
+    public void update(final int action, final float x, final float y) throws Exception
     {
     	//if we don't have a selection
     	if (!getLevelSelect().hasSelection())
     	{
     		//if action up, check the location
-    		if (event.getAction() == MotionEvent.ACTION_UP)
+    		if (action == MotionEvent.ACTION_UP)
     			getLevelSelect().setCheck((int)x, (int)y);
     		
     		//don't continue
@@ -246,11 +306,19 @@ public final class Game implements IGame
     	//make sure the board is generated before interacting
     	if (getBoard().isGenerated())
     	{
-	        //update the following
-	        if (getController() != null)
-	        	getController().update(event, x, y);
-	        if (getBoard() != null)
-	        	getBoard().update(event, x, y);
+    		//make sure we aren't starting
+    		if (!this.start)
+    		{
+		        //update the following
+		        if (getController() != null)
+		        	getController().update(action, x, y);
+		        if (getBoard() != null)
+		        	getBoard().update(action, x, y);
+    		}
+	        
+	        //flag start false
+    		if (action == MotionEvent.ACTION_UP)
+    			this.start = false;
     	}
     }
     
@@ -267,7 +335,22 @@ public final class Game implements IGame
     		
     		//if we have a selection now, reset the board
     		if (getLevelSelect().hasSelection())
-    			reset();
+    		{
+    			//make sure the level is not locked, if it is locked play sound effect
+    			if (getLevelSelect().isLocked(getLevelSelect().getLevelIndex()))
+    			{
+    				//flag selection as false
+    				getLevelSelect().setSelection(false);
+    				
+    				//play sound effect
+    				Audio.play(Assets.AudioGameKey.InvalidLevelSelect);
+    			}
+    			else
+    			{
+    				//reset the board for the next level
+    				reset();
+    			}
+    		}
     		
     		//no need to continue
     		return;
@@ -286,11 +369,42 @@ public final class Game implements IGame
 	        	if (getController() != null)
 	        		getController().reset();
 	        	
+	        	//the number of different colors
+	        	final int colors;
+	        	
+	        	//determine the number of colors used
+	        	switch (getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_COLORS))
+	        	{
+		        	case 0:
+		        	default:
+		        		colors = 6;
+		        		break;
+		        		
+		        	case 1:
+		        		colors = 3;
+		        		break;
+		        		
+		        	case 2:
+		        		colors = 4;
+		        		break;
+		        		
+		        	case 3:
+		        		colors = 5;
+		        		break;
+	        	}
+	        	
 	        	//reset with the specified size and colors
 	    		getBoard().reset(
 					getLevelSelect().getLevelIndex() + DEFAULT_DIMENSION, 
-	    			getScreen().getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_COLORS) + 3
+	    			colors
 	    		);
+	    		
+	    		//update the number to be displayed here
+				getNumber().setNumber(
+					getBoard().getMax() - getBoard().getAttempts(), 
+					ATTEMPT_X,
+					ATTEMPT_Y
+				);
         	}
         }
         else
@@ -302,7 +416,7 @@ public final class Game implements IGame
         		if (getBoard().getAttempts() >= getBoard().getMax())
         		{
         			//set losing message
-        			getScreen().getScreenGameover().setMessage("You Lose!");
+        			getScreen().getScreenGameover().setMessage("You Lose!", GameoverScreen.BUTTON_TEXT_REPLAY);
         			
             		//go to game over state
             		getScreen().setState(State.GameOver);
@@ -312,17 +426,31 @@ public final class Game implements IGame
         		}
         		else
         		{
+		    		//store the # of attempts
+		    		final int attempts = getBoard().getAttempts();
+		    		
 		        	//update the game elements
 		        	if (getController() != null)
 		        		getController().update();
 		        	if (getBoard() != null)
 		        		getBoard().update();
+		    		
+			        //if the number of attempts has changed
+			        if (attempts != getBoard().getAttempts())
+			        {
+						//assign the appropriate number to render
+						getNumber().setNumber(
+							getBoard().getMax() - getBoard().getAttempts(), 
+							ATTEMPT_X,
+							ATTEMPT_Y
+						);
+			        }
         		}
         	}
         	else
         	{
         		//assign win message
-    			getScreen().getScreenGameover().setMessage("Congratulations");
+    			getScreen().getScreenGameover().setMessage("Congratulations", GameoverScreen.BUTTON_TEXT_NEW_GAME);
     			
     			//save the result
     			getScorecard().update(
@@ -385,13 +513,22 @@ public final class Game implements IGame
 		    	if (getController() != null)
 		    		getController().render(canvas);
 		    	
-		    	//render the number of remaining attempts
-		    	canvas.drawText(
-		    		"Remaining - " + (getBoard().getMax() - getBoard().getAttempts()), 
-		    		ATTEMPT_X, 
-		    		ATTEMPT_Y, 
-		    		getScreen().getPaint()
-		    	);
+		    	//if we are just starting, render our message
+		    	if (this.start)
+				{
+					//darken the background
+					ScreenManager.darkenBackground(canvas, HINT_TEXT_ALPHA_BACKGROUND);
+					
+					//render the helper text instructions
+					canvas.drawBitmap(Images.getImage(Assets.ImageGameKey.Message), 0, 0, null);
+				}
+		    	
+    			//render the switches if possible
+    			if (getBoard().canRenderSwitches())
+    				getBoard().getSwitches().render(canvas);
+    			
+				//render the assigned number
+				getNumber().render(canvas);
     		}
     		else
     		{
@@ -431,6 +568,12 @@ public final class Game implements IGame
         {
         	scoreCard.dispose();
         	scoreCard = null;
+        }
+        
+        if (number != null)
+        {
+        	number.dispose();
+        	number = null;
         }
     }
 }

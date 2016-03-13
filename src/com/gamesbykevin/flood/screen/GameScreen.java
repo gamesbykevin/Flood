@@ -1,7 +1,6 @@
 package com.gamesbykevin.flood.screen;
 
 import android.graphics.Canvas;
-import android.view.MotionEvent;
 import com.gamesbykevin.androidframework.resources.Disposable;
 import com.gamesbykevin.androidframework.screen.Screen;
 import com.gamesbykevin.flood.game.Game;
@@ -44,11 +43,32 @@ public class GameScreen implements Screen, Disposable
         //reset the level select
         getGame().getLevelSelect().reset();
         
-        getGame().getLevelSelect().setDescription(
-    		(screen.getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_COLORS) + 3) + " Colors - ",
-    		(GamePanel.WIDTH / 2) - 120, 
-    		GamePanel.HEIGHT - 25
-        );
+        //the description for the level select
+        final String description;
+        
+        //determine the description shown
+        switch (screen.getScreenOptions().getIndex(OptionsScreen.INDEX_BUTTON_COLORS))
+        {
+        	case 0:
+        	default:
+        		description = "6 Colors - ";
+        		break;
+        		
+        	case 1:
+        		description = "3 Colors - ";
+        		break;
+        		
+        	case 2:
+        		description = "4 Colors - ";
+        		break;
+        		
+        	case 3:
+        		description = "5 Colors - ";
+        		break;
+        }
+        
+        //set the level description
+        getGame().getLevelSelect().setDescription(description, (GamePanel.WIDTH / 2) - 120, GamePanel.HEIGHT - 25);
     }
     
     /**
@@ -61,10 +81,10 @@ public class GameScreen implements Screen, Disposable
     }
     
     @Override
-    public boolean update(final MotionEvent event, final float x, final float y) throws Exception
+    public boolean update(final int action, final float x, final float y) throws Exception
     {
         if (getGame() != null)
-            getGame().update(event, x, y);
+            getGame().update(action, x, y);
         
         return true;
     }

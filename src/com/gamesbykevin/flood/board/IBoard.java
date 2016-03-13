@@ -3,7 +3,6 @@ package com.gamesbykevin.flood.board;
 import com.gamesbykevin.androidframework.resources.Disposable;
 
 import android.graphics.Canvas;
-import android.view.MotionEvent;
 
 public interface IBoard extends Disposable
 {
@@ -13,7 +12,7 @@ public interface IBoard extends Disposable
 	 * @param x x-coordinate
 	 * @param y y-coordinate
 	 */
-	public void update(final MotionEvent event, final float x, final float y);
+	public void update(final int action, final float x, final float y);
 	
 	/**
 	 * Update common elements

@@ -141,10 +141,10 @@ public class OptionsScreen implements Screen, Disposable
     private void addButtonColors(final int x, final int y)
     {
         Button button = new Button(Images.getImage(Assets.ImageMenuKey.Button));
+        button.addDescription("Colors: 6");
         button.addDescription("Colors: 3");
         button.addDescription("Colors: 4");
         button.addDescription("Colors: 5");
-        button.addDescription("Colors: 6");
         button.setX(x);
         button.setY(y);
         this.buttons.put(INDEX_BUTTON_COLORS, button);
@@ -242,10 +242,10 @@ public class OptionsScreen implements Screen, Disposable
     }
     
     @Override
-    public boolean update(final MotionEvent event, final float x, final float y) throws Exception
+    public boolean update(final int action, final float x, final float y) throws Exception
     {
     	//we only want motion event up
-    	if (event.getAction() != MotionEvent.ACTION_UP)
+    	if (action != MotionEvent.ACTION_UP)
     		return true;
     	
         if (buttons != null)
